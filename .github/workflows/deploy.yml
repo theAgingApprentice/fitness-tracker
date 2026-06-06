@@ -77,7 +77,7 @@ jobs:
         run: |
           echo "Waiting for container to be ready..."
           sleep 5
-          result=$(docker exec fitness-tracker python3 -c "import urllib.request; r=urllib.request.urlopen('http://localhost:5000/fitness/api/health'); print(r.status)" 2>&1)
+          result=$(docker exec fitness-tracker python3 -c "import urllib.request; r=urllib.request.urlopen('http://localhost:5000/api/health'); print(r.status)" 2>&1)
           echo "Health check result: $result"
           if [ "$result" != "200" ]; then
             echo "ERROR: Health check failed: $result"

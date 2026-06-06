@@ -13,34 +13,15 @@ app = Flask(__name__)
 CORS(app)
 
 # Register blueprints
-app.register_blueprint(api_bp, url_prefix='/fitness/api')
+app.register_blueprint(api_bp, url_prefix='/api')
 
-@app.route('/fitness/')
+@app.route('/')
 def serve_frontend():
     return send_from_directory('frontend', 'index.html')
 
-@app.route('/fitness/<path:path>')
+@app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory('frontend', path)
-
-@app.route('/')
-def index():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1")
-        cursor.fetchone()
-        close_db_connection(conn)
-        return jsonify({
-            'status': 'healthy',
-            'database': 'connected'
-        })
-    except Exception as e:
-        return jsonify({
-            'status': 'unhealthy',
-            'database': 'disconnected',
-            'error': str(e)
-        }), 500
 
 if __name__ == '__main__':
     debug_mode = os.getenv('FLASK_DEBUG', '0') == '1'
