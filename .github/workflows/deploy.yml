@@ -75,14 +75,13 @@ jobs:
 
       - name: Verify deployment
         run: |
-          set -euo pipefail
           echo "Waiting for container to be ready..."
           sleep 5
-          status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/fitness/api/health)
-          echo "Health check status: $status"
-          if [ "$status" != "200" ]; then
-            echo "ERROR: Health check failed with status $status"
-            docker compose -f /home/andrew/services/fitness-tracker/docker-compose.yml logs fitness-tracker
+          result=$(docker exec fitness-tracker python3 -c "import urllib.request; r=urllib.request.urlopen('http://localhost:5000/fitness/api/health'); print(r.status)" 2>&1)
+          echo "Health check result: $result"
+          if [ "$result" != "200" ]; then
+            echo "ERROR: Health check failed: $result"
+            docker compose logs fitness-tracker --tail 20
             exit 1
           fi
           echo "✅ Fitness Tracker deployment verified successfully"
