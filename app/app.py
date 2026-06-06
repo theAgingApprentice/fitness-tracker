@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
@@ -17,16 +17,6 @@ app.register_blueprint(api_bp, url_prefix='/fitness/api')
 
 @app.route('/')
 def index():
-    """Health check endpoint"""
-    return jsonify({
-        'status': 'healthy',
-        'environment': os.getenv('ENVIRONMENT', 'unknown'),
-        'message': 'Fitness Tracker Backend is running'
-    })
-
-@app.route('/api/health')
-def health():
-    """Database health check"""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
