@@ -17,11 +17,11 @@ app.register_blueprint(api_bp, url_prefix='/fitness/api')
 
 @app.route('/fitness/')
 def serve_frontend():
-    return send_from_directory('../frontend', 'index.html')
+    return send_from_directory('frontend', 'index.html')
 
-@app.route('/fitness/static/<path:path>')
+@app.route('/fitness/<path:path>')
 def serve_static(path):
-    return send_from_directory('../frontend', path)
+    return send_from_directory('frontend', path)
 
 @app.route('/')
 def index():
