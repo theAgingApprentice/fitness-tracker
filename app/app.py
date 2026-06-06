@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
@@ -14,6 +14,14 @@ CORS(app)
 
 # Register blueprints
 app.register_blueprint(api_bp, url_prefix='/fitness/api')
+
+@app.route('/fitness/')
+def serve_frontend():
+    return send_from_directory('../frontend', 'index.html')
+
+@app.route('/fitness/static/<path:path>')
+def serve_static(path):
+    return send_from_directory('../frontend', path)
 
 @app.route('/')
 def index():

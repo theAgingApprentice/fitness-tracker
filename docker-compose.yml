@@ -1,8 +1,8 @@
 services:
   fitness-tracker:
     build:
-      context: ./app
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: app/Dockerfile
     image: fitness-tracker:latest
     container_name: fitness-tracker
     restart: unless-stopped
