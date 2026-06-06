@@ -3,6 +3,26 @@ from config.database import get_db_connection, close_db_connection
 
 api_bp = Blueprint('api', __name__)
 
+@api_bp.route('/health')
+def health():
+    """Database health check"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        close_db_connection(conn)
+        return jsonify({
+            'status': 'healthy',
+            'database': 'connected'
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'unhealthy',
+            'database': 'disconnected',
+            'error': str(e)
+        }), 500
+
 @api_bp.route('/items', methods=['GET'])
 def get_items():
     """Get all items from database"""
