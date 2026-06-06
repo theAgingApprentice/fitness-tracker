@@ -2,7 +2,7 @@
 const isDevEnv = /mitchellnet\.dev\.local$/i.test(window.location.hostname) || window.location.hostname === 'localhost';
 const API_BASE_URL = isDevEnv
     ? 'http://localhost:5001/api'  // Development
-    : '/api'; // Production - use relative path through nginx proxy
+    : '/fitness/api'; // Production - use relative path through nginx proxy
 
 // State
 let allUnits = [];
