@@ -1,0 +1,417 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: #f5f5f5;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+header {
+    background: white;
+    color: black;
+    padding: 40px;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: black;
+}
+
+.subtitle {
+    font-size: 1.1em;
+    color: black;
+    opacity: 0.7;
+}
+
+.status {
+    padding: 20px 40px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-indicator::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ffc107;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.healthy::before {
+    background: #28a745;
+}
+
+.status-indicator.error::before {
+    background: #dc3545;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+main {
+    padding: 40px;
+}
+
+section {
+    margin-bottom: 40px;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: #333;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #333;
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background: #555;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    font-size: 0.9em;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.item-card {
+    background: #f8f9fa;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    transition: transform 0.2s;
+}
+
+.item-card:hover {
+    transform: translateX(5px);
+}
+
+.item-content h3 {
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.item-content p {
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.item-date {
+    font-size: 0.85em;
+    color: #999;
+}
+
+.loading {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+}
+
+.error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.success {
+    background: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+footer {
+    background: #f8f9fa;
+    padding: 20px 40px;
+    text-align: center;
+    color: #666;
+    border-top: 1px solid #e9ecef;
+}
+
+#environment {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Calendar Styles */
+.calendar-section {
+    margin-bottom: 30px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-header h2 {
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
+.btn-nav {
+    background: white;
+    color: black;
+    border: 1px solid #dee2e6;
+    padding: 10px 20px;
+    font-size: 0.9em;
+}
+
+.btn-nav:hover {
+    background: #f8f9fa;
+    border-color: black;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.calendar-day-header {
+    background: #343a40;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.calendar-day {
+    background: white;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: center;
+    min-height: 60px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.calendar-day:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.calendar-day.empty {
+    background: #f8f9fa;
+    cursor: default;
+}
+
+.calendar-day.empty:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.calendar-day.has-activity {
+    background: #28a745;
+    color: white;
+    border-color: #218838;
+    font-weight: bold;
+}
+
+.calendar-day.has-activity:hover {
+    background: #218838;
+}
+
+.calendar-day.today {
+    border: 2px solid #007bff;
+    font-weight: bold;
+}
+
+.day-number {
+    font-size: 1.2em;
+}
+
+.activity-count {
+    font-size: 0.8em;
+    margin-top: 5px;
+    opacity: 0.9;
+}
+
+/* Activity Details */
+.activity-details {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid #e9ecef;
+}
+
+.activity-item {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.activity-details-grid {
+    flex-grow: 1;
+}
+
+.detail-row {
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.detail-row strong {
+    color: #555;
+    display: inline-block;
+    min-width: 80px;
+}
+
+.activity-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.85em;
+}
+
+.btn-change {
+    background: #007bff;
+    color: white;
+}
+
+.btn-change:hover {
+    background: #0056b3;
+}
+
+/* Add Activity Form */
+.add-activity-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.add-activity-form h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.form-row {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-row label {
+    min-width: 80px;
+    font-weight: 600;
+    color: #555;
+}
+
+.form-row select,
+.form-row input[type="text"],
+.form-row input[type="number"] {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 0.95em;
+}
+
+.form-row input[readonly] {
+    background: #e9ecef;
+    cursor: not-allowed;
+}

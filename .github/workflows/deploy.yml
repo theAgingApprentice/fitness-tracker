@@ -1,0 +1,98 @@
+name: Deploy Fitness Tracker to Production
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install dependencies
+        run: |
+          python3 -m venv /home/andrew/bis-venv
+          /home/andrew/bis-venv/bin/pip install -r app/requirements.txt --quiet
+
+      - name: Run tests
+        run: |
+          if [ -d "tests" ] && [ "$(ls -A tests/)" ]; then
+            /home/andrew/bis-venv/bin/pytest tests/ -v
+          else
+            echo "No tests found, skipping."
+          fi
+
+  deploy:
+    name: Deploy to Production
+    needs: test
+    runs-on: self-hosted
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set variables
+        run: |
+          echo "SERVICE_ROOT=/home/andrew/services/fitness-tracker" >> $GITHUB_ENV
+
+      - name: Ensure service directory exists
+        run: |
+          mkdir -p /home/andrew/services/fitness-tracker
+
+      - name: Deploy code to service directory
+        run: |
+          set -euo pipefail
+          echo "=== Syncing code to $SERVICE_ROOT ==="
+          rsync -av --delete \
+            --exclude='.git/' \
+            --exclude='.env' \
+            --exclude='__pycache__/' \
+            --exclude='*.pyc' \
+            ./ "$SERVICE_ROOT"/
+          echo "Code sync completed"
+
+      - name: Build and restart container
+        run: |
+          set -euo pipefail
+          cd "$SERVICE_ROOT"
+          echo "=== Building fitness-tracker image ==="
+          docker compose build fitness-tracker
+          echo "=== Restarting fitness-tracker container ==="
+          docker compose up -d --no-deps fitness-tracker
+          echo "Container restarted"
+
+      - name: Verify deployment
+        run: |
+          set -euo pipefail
+          echo "Waiting for container to be ready..."
+          sleep 5
+          status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/fitness/api/health)
+          echo "Health check status: $status"
+          if [ "$status" != "200" ]; then
+            echo "ERROR: Health check failed with status $status"
+            docker compose -f /home/andrew/services/fitness-tracker/docker-compose.yml logs fitness-tracker
+            exit 1
+          fi
+          echo "✅ Fitness Tracker deployment verified successfully"
+
+      - name: Deployment summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🚀 Fitness Tracker Deployment Complete!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Commit: $GITHUB_SHA"
+          echo "Deployed by: ${{ github.actor }}"
+          echo "URL: https://mitchellnet.local/fitness/"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

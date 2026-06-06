@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Environment Banner -->
+    <div id="env-banner" class="env-prod">
+    </div>
+
+    <!-- Include Header -->
+    <div data-include="/header.html"></div>
+
+    <div class="content">
+        <div class="container">
+            <header>
+                <h1>Fitness Tracker <span style="font-size: 0.5em; color: #666;">v2.1.0</span></h1>
+                <p class="subtitle">Track your fitness journey with ease</p>
+            </header>
+
+            <div style="padding: 0 40px; margin-top: -20px; margin-bottom: 20px; text-align: right;">
+                <a href="/fitnessTracker/admin.html" class="btn btn-secondary">⚙️ Admin</a>
+            </div>
+
+            <div class="status">
+                <div id="apiStatus" class="status-indicator">
+                    <span id="statusText">Checking API...</span>
+                </div>
+            </div>
+
+            <main>
+                <section class="calendar-section">
+                    <div class="calendar-header">
+                        <button id="prevMonth" class="btn btn-nav">&larr; Prev</button>
+                        <h2 id="currentMonth">Loading...</h2>
+                        <button id="nextMonth" class="btn btn-nav">Next &rarr;</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <div class="calendar-day-header">Sun</div>
+                        <div class="calendar-day-header">Mon</div>
+                        <div class="calendar-day-header">Tue</div>
+                        <div class="calendar-day-header">Wed</div>
+                        <div class="calendar-day-header">Thu</div>
+                        <div class="calendar-day-header">Fri</div>
+                        <div class="calendar-day-header">Sat</div>
+                    </div>
+                </section>
+
+                <section class="activity-details" id="activityDetails" style="display: none;">
+                    <h2>Activities for <span id="selectedDate"></span></h2>
+                    <div id="activitiesContainer">
+                        <p class="loading">Loading activities...</p>
+                    </div>
+
+                    <div class="add-activity-form" id="addActivityForm" style="margin-top: 20px;">
+                        <h3>Add Activity</h3>
+                        <form id="activityForm">
+                            <div class="form-row">
+                                <label for="activitySelect">Activity:</label>
+                                <select id="activitySelect" required>
+                                    <option value="">Select activity...</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="unitDisplay">Units:</label>
+                                <input type="text" id="unitDisplay" readonly>
+                            </div>
+                            <div class="form-row">
+                                <label for="valueInput">Value:</label>
+                                <input type="number" id="valueInput" required min="0">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Activity</button>
+                        </form>
+                    </div>
+                </section>
+            </main>
+
+        <footer>
+            <p>Environment: <span id="environment">Unknown</span></p>
+        </footer>
+    </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="/js/includes.js" defer></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

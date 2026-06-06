@@ -1,42 +1,58 @@
-# fitness-tracker
+# Fitness Tracker
 
-> **STATUS: Being extracted from InternalWebServer — not yet independently deployed**
->
-> The app is currently live at [https://mitchellnet.local/fitness/](https://mitchellnet.local/fitness/) but is still served from the InternalWebServer repo. This repository will own the standalone service once extraction is complete.
+A Flask-based fitness tracking application with a MariaDB database. Tracks daily activities on a calendar interface.
 
-## Project overview
+## URL
 
-`fitness-tracker` is a Flask-based fitness tracking web application backed by a MariaDB database. It is currently embedded in the InternalWebServer repository and is being extracted into its own standalone service following the MitchellNET service architecture pattern.
+- **App:** https://mitchellnet.local/fitness/
+- **API base path:** `/fitness/api/`
+- **Admin:** https://mitchellnet.local/fitness/admin.html
 
-## Planned architecture
+## Structure
 
-- Flask backend with a MariaDB database
-- Deployed as a Docker container joining the `mitchellnet` network
-- Accessible at [https://mitchellnet.local/fitness/](https://mitchellnet.local/fitness/) via an NGINX proxy
-- Internal service port: `5000`
-- MariaDB data volume will be migrated from the existing `mariadb-prod` container
-- API paths will change from `/api` to `/fitness/api` to avoid namespace collisions
+```
+fitness-tracker/
+├── app/                    # Flask backend
+│   ├── app.py
+│   ├── config/
+│   ├── models/
+│   ├── routes/
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/               # Static HTML/CSS/JS
+│   ├── index.html
+│   ├── admin.html
+│   ├── css/
+│   └── js/
+├── database/
+│   ├── structure/          # Schema + seed SQL (run in order: units, activities, activityLog)
+│   └── migrations/         # Future schema migrations
+└── docker-compose.yml
+```
 
-## Extraction plan
+## Deployment
 
-The migration will follow the steps from `docs/ARCHITECTURE.md` Section 8:
+### First-time setup on the server
 
-1. Create the standalone repository structure
-2. Write the `Dockerfile`
-3. Write `docker-compose.yml`
-4. Set up CI/CD
-5. Update API paths in `app.js`
-6. Deploy alongside the existing stack
-7. Migrate MariaDB data
-8. Update NGINX routing
-9. Verify the extracted service
-10. Remove the embedded implementation from InternalWebServer
+```bash
+cd /home/andrew/services/fitness-tracker
+cp .env.example .env
+# Edit .env with production credentials
+docker compose up -d
+```
+
+### Routine deployment
+
+Push to `main` or trigger the GitHub Actions workflow manually. The workflow syncs code, rebuilds the image, and restarts the container.
+
+### Data migration note
+
+The `database/structure/` SQL files contain both schema and seed data (670+ activity log entries from InternalWebServer). On first deployment, MariaDB runs these automatically via `docker-entrypoint-initdb.d`. Run them in order: `units.sql` → `activities.sql` → `activityLog.sql`. This is not done automatically on subsequent deployments — use `database/migrations/` for schema changes going forward.
 
 ## Development workflow
 
-All changes will go through pull requests using `aaGitPromote` and `aaGitCleanupBranches`. For the full developer workflow documentation, see `mitchellnet-infra/docs/runbook.md`.
+See [mitchellnet-infra/docs/runbook.md](../mitchellnet-infra/docs/runbook.md) for the full local development setup, NGINX proxy configuration, and service management procedures.
 
-## MitchellNET context
+## Environment variables
 
-- `mitchellnet-infra` contains the overall MitchellNET architecture
-- `InternalWebServer` contains the current embedded implementation of this app
+See [.env.example](.env.example) for all required variables.
