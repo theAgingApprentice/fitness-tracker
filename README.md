@@ -1,5 +1,7 @@
 # Fitness Tracker
 
+> **STATUS: LIVE at https://mitchellnet.local/fitness/**
+
 A Flask-based fitness tracking application with a MariaDB database. Tracks daily activities on a calendar interface.
 
 ## URL
@@ -32,6 +34,16 @@ fitness-tracker/
 
 ## Deployment
 
+The app runs fully in production on the Ubuntu server at `192.168.2.10`.
+
+| Component | Details |
+|-----------|---------|
+| Flask app | Docker container, `mitchellnet` Docker network |
+| MariaDB | Separate container, `fitness-internal` network (not exposed externally) |
+| NGINX proxy | Routes `/fitness/` using Approach A (trailing slash on `proxy_pass`) — see mitchellnet-infra runbook |
+| CI/CD | GitHub Actions deploys automatically on every merged PR |
+| Build | `docker compose build --no-cache` runs on every deploy |
+
 ### First-time setup on the server
 
 ```bash
@@ -41,13 +53,9 @@ cp .env.example .env
 docker compose up -d
 ```
 
-### Routine deployment
-
-Push to `main` or trigger the GitHub Actions workflow manually. The workflow syncs code, rebuilds the image, and restarts the container.
-
 ### Data migration note
 
-The `database/structure/` SQL files contain both schema and seed data (670+ activity log entries from InternalWebServer). On first deployment, MariaDB runs these automatically via `docker-entrypoint-initdb.d`. Run them in order: `units.sql` → `activities.sql` → `activityLog.sql`. This is not done automatically on subsequent deployments — use `database/migrations/` for schema changes going forward.
+The `database/structure/` SQL files contain both schema and seed data (670+ activity log entries). On first deployment, MariaDB runs these automatically via `docker-entrypoint-initdb.d`. Run them in order: `units.sql` → `activities.sql` → `activityLog.sql`. For subsequent schema changes, use `database/migrations/`.
 
 ## Development workflow
 
