@@ -68,7 +68,7 @@ jobs:
           set -euo pipefail
           cd "$SERVICE_ROOT"
           echo "=== Building fitness-tracker image ==="
-          docker compose build fitness-tracker
+          docker compose build --no-cache fitness-tracker
           echo "=== Restarting fitness-tracker container ==="
           docker compose up -d --no-deps fitness-tracker
           echo "Container restarted"
