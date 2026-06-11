@@ -1,7 +1,23 @@
 from flask import Blueprint, jsonify, request
+from functools import wraps
+import hmac
+import os
 from config.database import get_db_connection, close_db_connection
 
 api_bp = Blueprint('api', __name__)
+
+def require_api_key(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        key = request.headers.get('X-API-Key', '')
+        expected = os.environ.get('API_KEY', '')
+        if not expected:
+            # Fail closed: if no key is configured, deny all requests
+            return jsonify({'error': 'Server misconfiguration'}), 500
+        if not hmac.compare_digest(key, expected):
+            return jsonify({'error': 'Unauthorized'}), 401
+        return f(*args, **kwargs)
+    return decorated
 
 @api_bp.route('/health')
 def health():
@@ -24,6 +40,7 @@ def health():
         }), 500
 
 @api_bp.route('/items', methods=['GET'])
+@require_api_key
 def get_items():
     """Get all items from database"""
     try:
@@ -44,6 +61,7 @@ def get_items():
         }), 500
 
 @api_bp.route('/items', methods=['POST'])
+@require_api_key
 def create_item():
     """Create a new item"""
     try:
@@ -82,6 +100,7 @@ def create_item():
         }), 500
 
 @api_bp.route('/items/<int:item_id>', methods=['DELETE'])
+@require_api_key
 def delete_item(item_id):
     """Delete an item by ID"""
     try:
@@ -109,6 +128,7 @@ def delete_item(item_id):
         }), 500
 
 @api_bp.route('/test-month', methods=['GET'])
+@require_api_key
 def test_month():
     """Test endpoint to debug month query"""
     try:
@@ -139,6 +159,7 @@ def test_month():
         }), 500
 
 @api_bp.route('/activities', methods=['GET'])
+@require_api_key
 def get_activities():
     """Get all activities with their units"""
     try:
@@ -165,6 +186,7 @@ def get_activities():
         }), 500
 
 @api_bp.route('/activity-log', methods=['GET'])
+@require_api_key
 def get_activity_log():
     """Get activity log entries, optionally filtered by date or month"""
     try:
@@ -228,6 +250,7 @@ def get_activity_log():
         }), 500
 
 @api_bp.route('/activity-log', methods=['POST'])
+@require_api_key
 def create_activity_log():
     """Create a new activity log entry"""
     try:
@@ -268,6 +291,7 @@ def create_activity_log():
         }), 500
 
 @api_bp.route('/activity-log/<int:log_id>', methods=['PUT'])
+@require_api_key
 def update_activity_log(log_id):
     """Update an activity log entry"""
     try:
@@ -307,6 +331,7 @@ def update_activity_log(log_id):
         }), 500
 
 @api_bp.route('/activity-log/<int:log_id>', methods=['DELETE'])
+@require_api_key
 def delete_activity_log(log_id):
     """Delete an activity log entry"""
     try:
@@ -336,6 +361,7 @@ def delete_activity_log(log_id):
 # ============ ADMIN ENDPOINTS ============
 
 @api_bp.route('/admin/unit-types', methods=['GET'])
+@require_api_key
 def get_unit_types():
     """Get all unique unit types"""
     try:
@@ -358,6 +384,7 @@ def get_unit_types():
         }), 500
 
 @api_bp.route('/admin/unit-types', methods=['POST'])
+@require_api_key
 def create_unit_type():
     """Add a new unit type (just validates it doesn't exist)"""
     try:
@@ -383,6 +410,7 @@ def create_unit_type():
         }), 500
 
 @api_bp.route('/admin/unit-types/<string:type_name>', methods=['DELETE'])
+@require_api_key
 def delete_unit_type(type_name):
     """Delete a unit type (only if not used by any units)"""
     try:
@@ -413,6 +441,7 @@ def delete_unit_type(type_name):
         }), 500
 
 @api_bp.route('/admin/units', methods=['GET'])
+@require_api_key
 def get_units():
     """Get all units"""
     try:
@@ -433,6 +462,7 @@ def get_units():
         }), 500
 
 @api_bp.route('/admin/units', methods=['POST'])
+@require_api_key
 def create_unit():
     """Create a new unit"""
     try:
@@ -471,6 +501,7 @@ def create_unit():
         }), 500
 
 @api_bp.route('/admin/units/<int:unit_id>', methods=['PUT'])
+@require_api_key
 def update_unit(unit_id):
     """Update a unit"""
     try:
@@ -511,6 +542,7 @@ def update_unit(unit_id):
         }), 500
 
 @api_bp.route('/admin/units/<int:unit_id>', methods=['DELETE'])
+@require_api_key
 def delete_unit(unit_id):
     """Delete a unit (only if not used by any activities)"""
     try:
@@ -550,6 +582,7 @@ def delete_unit(unit_id):
         }), 500
 
 @api_bp.route('/admin/activities', methods=['POST'])
+@require_api_key
 def create_activity():
     """Create a new activity"""
     try:
@@ -590,6 +623,7 @@ def create_activity():
         }), 500
 
 @api_bp.route('/admin/activities/<int:activity_id>', methods=['PUT'])
+@require_api_key
 def update_activity(activity_id):
     """Update an activity"""
     try:
@@ -631,6 +665,7 @@ def update_activity(activity_id):
         }), 500
 
 @api_bp.route('/admin/activities/<int:activity_id>', methods=['DELETE'])
+@require_api_key
 def delete_activity(activity_id):
     """Delete an activity (only if not used in any activity logs)"""
     try:

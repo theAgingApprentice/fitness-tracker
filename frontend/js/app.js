@@ -4,6 +4,11 @@ const API_BASE_URL = isDevEnv
     ? 'http://localhost:5001/api'  // Development
     : '/fitness/api'; // Production - use relative path through nginx proxy
 
+const API_KEY = window.FITNESS_API_KEY || '';
+function getAuthHeaders(extra = {}) {
+    return { 'X-API-Key': API_KEY, ...extra };
+}
+
 // State
 let currentDate = new Date();
 let activeDates = new Set();
@@ -50,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load available activities
 async function loadActivities() {
     try {
-        const response = await fetch(`${API_BASE_URL}/activities`);
+        const response = await fetch(`${API_BASE_URL}/activities`, { headers: getAuthHeaders() });
         const data = await response.json();
 
         if (data.success) {
@@ -90,7 +95,7 @@ function updateUnitsDisplay() {
 // Check API health
 async function checkAPIHealth() {
     try {
-        const response = await fetch(`${API_BASE_URL.replace('/fitness/api', '')}/fitness/api/health`);
+        const response = await fetch(`${API_BASE_URL.replace('/fitness/api', '')}/fitness/api/health`, { headers: getAuthHeaders() });
         const data = await response.json();
 
         if (data.status === 'healthy') {
@@ -168,7 +173,7 @@ async function renderCalendar() {
 async function loadActiveDates(year, month) {
     try {
         const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
-        const response = await fetch(`${API_BASE_URL}/activity-log?month=${monthStr}`);
+        const response = await fetch(`${API_BASE_URL}/activity-log?month=${monthStr}`, { headers: getAuthHeaders() });
         const data = await response.json();
 
         if (data.success) {
@@ -191,7 +196,7 @@ async function showActivitiesForDate(dateStr) {
         activityDetailsEl.style.display = 'block';
         activitiesContainer.innerHTML = '<p class="loading">Loading activities...</p>';
 
-        const response = await fetch(`${API_BASE_URL}/activity-log?date=${dateStr}`);
+        const response = await fetch(`${API_BASE_URL}/activity-log?date=${dateStr}`, { headers: getAuthHeaders() });
         const data = await response.json();
 
         if (data.success) {
@@ -262,9 +267,7 @@ async function handleAddActivity(e) {
     try {
         const response = await fetch(`${API_BASE_URL}/activity-log`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({
                 activityId: activityId,
                 date: selectedDateStr,
@@ -304,9 +307,7 @@ async function editActivity(id, activityId, currentDuration) {
     try {
         const response = await fetch(`${API_BASE_URL}/activity-log/${id}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({
                 duration: newDuration
             })
@@ -333,7 +334,8 @@ async function deleteActivity(id) {
 
     try {
         const response = await fetch(`${API_BASE_URL}/activity-log/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
 
         const result = await response.json();

@@ -4,6 +4,11 @@ const API_BASE_URL = isDevEnv
     ? 'http://localhost:5001/api'  // Development
     : '/fitness/api'; // Production - use relative path through nginx proxy
 
+const API_KEY = window.FITNESS_API_KEY || '';
+function getAuthHeaders(extra = {}) {
+    return { 'X-API-Key': API_KEY, ...extra };
+}
+
 // State
 let allUnits = [];
 let allActivities = [];
@@ -43,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Check API health
 async function checkAPIHealth() {
     try {
-        const response = await fetch(`${API_BASE_URL.replace('/api', '')}/api/health`);
+        const response = await fetch(`${API_BASE_URL.replace('/api', '')}/api/health`, { headers: getAuthHeaders() });
         const data = await response.json();
 
         if (data.status === 'healthy') {
@@ -64,7 +69,7 @@ async function checkAPIHealth() {
 
 async function loadUnitTypes() {
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/unit-types`);
+        const response = await fetch(`${API_BASE_URL}/admin/unit-types`, { headers: getAuthHeaders() });
         const data = await response.json();
 
         if (data.success) {
@@ -128,9 +133,7 @@ async function handleUnitTypeSubmit(e) {
     try {
         const response = await fetch(`${API_BASE_URL}/admin/unit-types`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({
                 name: name
             })
@@ -163,7 +166,8 @@ async function deleteUnitType(typeName) {
 
     try {
         const response = await fetch(`${API_BASE_URL}/admin/unit-types/${encodeURIComponent(typeName)}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
 
         const result = await response.json();
@@ -184,7 +188,7 @@ async function deleteUnitType(typeName) {
 
 async function loadUnits() {
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/units`);
+        const response = await fetch(`${API_BASE_URL}/admin/units`, { headers: getAuthHeaders() });
         const data = await response.json();
 
         if (data.success) {
@@ -257,9 +261,7 @@ async function handleUnitSubmit(e) {
 
         const response = await fetch(url, {
             method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({
                 name: name,
                 unit: type
@@ -307,7 +309,8 @@ async function deleteUnit(id) {
 
     try {
         const response = await fetch(`${API_BASE_URL}/admin/units/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
 
         const result = await response.json();
@@ -329,7 +332,7 @@ async function deleteUnit(id) {
 
 async function loadActivities() {
     try {
-        const response = await fetch(`${API_BASE_URL}/activities`);
+        const response = await fetch(`${API_BASE_URL}/activities`, { headers: getAuthHeaders() });
         const data = await response.json();
 
         if (data.success) {
@@ -385,9 +388,7 @@ async function handleActivitySubmit(e) {
 
         const response = await fetch(url, {
             method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({
                 name: name,
                 unitId: unitId,
@@ -436,7 +437,8 @@ async function deleteActivity(id) {
 
     try {
         const response = await fetch(`${API_BASE_URL}/admin/activities/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
 
         const result = await response.json();
