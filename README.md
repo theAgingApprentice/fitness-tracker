@@ -64,3 +64,30 @@ See [mitchellnet-infra/docs/runbook.md](../mitchellnet-infra/docs/runbook.md) fo
 ## Environment variables
 
 See [.env.example](.env.example) for all required variables.
+
+---
+
+## Security
+
+### API Authentication
+
+All `/api/*` endpoints require an `X-API-Key` header. The `/api/health` endpoint
+is exempt (used by Docker healthcheck and uptime monitors).
+
+The API key is set via the `API_KEY` environment variable on the server. It is
+never committed to version control.
+
+**Server-side key injection:** Flask injects the API key into `index.html` and
+`admin.html` at request time, replacing `window.FITNESS_API_KEY = ''` with the
+live key value. The frontend JS reads `window.FITNESS_API_KEY` and sends it as
+the `X-API-Key` header on every fetch call. This means the key is never stored
+in any file in the repository.
+
+**Fail-closed:** If `API_KEY` is not set in the environment, the server returns
+`500` on all protected endpoints rather than allowing unauthenticated access.
+
+**Testing:** Auth tests live in `tests/test_auth.py`. Run with:
+
+```bash
+API_KEY=test-key python -m pytest tests/test_auth.py -v
+```
