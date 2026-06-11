@@ -15,8 +15,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-        with:
-          ref: main
 
       - name: Install dependencies
         run: |
@@ -24,6 +22,8 @@ jobs:
           /home/andrew/bis-venv/bin/pip install -r app/requirements.txt --quiet
 
       - name: Run tests
+        env:
+          API_KEY: test-key
         run: |
           if [ -d "tests" ] && [ "$(ls -A tests/)" ]; then
             /home/andrew/bis-venv/bin/pytest tests/ -v
