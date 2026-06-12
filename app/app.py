@@ -10,7 +10,10 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "https://192.168.2.10",
+    "https://mitchellnet.local",
+])
 
 # Register blueprints
 app.register_blueprint(api_bp, url_prefix='/api')
