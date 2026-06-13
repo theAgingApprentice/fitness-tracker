@@ -1,8 +1,11 @@
 from flask import Blueprint, jsonify, request
 from functools import wraps
 import hmac
+import logging
 import os
 from config.database import get_db_connection, close_db_connection
+
+logger = logging.getLogger(__name__)
 
 api_bp = Blueprint('api', __name__)
 
@@ -33,11 +36,8 @@ def health():
             'database': 'connected'
         })
     except Exception as e:
-        return jsonify({
-            'status': 'unhealthy',
-            'database': 'disconnected',
-            'error': str(e)
-        }), 500
+        logger.error("Health check failed: %s", e, exc_info=True)
+        return jsonify({'status': 'unhealthy', 'database': 'disconnected'}), 500
 
 @api_bp.route('/items', methods=['GET'])
 @require_api_key
@@ -55,10 +55,8 @@ def get_items():
             'data': items
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/items', methods=['POST'])
 @require_api_key
@@ -94,10 +92,8 @@ def create_item():
             }
         }), 201
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/items/<int:item_id>', methods=['DELETE'])
 @require_api_key
@@ -122,10 +118,8 @@ def delete_item(item_id):
             'message': 'Item deleted successfully'
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/test-month', methods=['GET'])
 @require_api_key
@@ -153,10 +147,8 @@ def test_month():
             'data': result
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/activities', methods=['GET'])
 @require_api_key
@@ -180,10 +172,8 @@ def get_activities():
             'data': activities
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/activity-log', methods=['GET'])
 @require_api_key
@@ -244,10 +234,8 @@ def get_activity_log():
             'data': logs
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/activity-log', methods=['POST'])
 @require_api_key
@@ -285,10 +273,8 @@ def create_activity_log():
             }
         }), 201
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/activity-log/<int:log_id>', methods=['PUT'])
 @require_api_key
@@ -325,10 +311,8 @@ def update_activity_log(log_id):
             'message': 'Activity log updated successfully'
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/activity-log/<int:log_id>', methods=['DELETE'])
 @require_api_key
@@ -353,10 +337,8 @@ def delete_activity_log(log_id):
             'message': 'Activity log deleted successfully'
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 # ============ ADMIN ENDPOINTS ============
 
@@ -378,10 +360,8 @@ def get_unit_types():
             'data': unit_types
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/admin/unit-types', methods=['POST'])
 @require_api_key
@@ -404,10 +384,8 @@ def create_unit_type():
             'message': 'Unit type registered successfully'
         }), 201
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/admin/unit-types/<string:type_name>', methods=['DELETE'])
 @require_api_key
@@ -435,10 +413,8 @@ def delete_unit_type(type_name):
             'message': 'Unit type can be safely removed (no units use it)'
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/admin/units', methods=['GET'])
 @require_api_key
@@ -456,10 +432,8 @@ def get_units():
             'data': units
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/admin/units', methods=['POST'])
 @require_api_key
@@ -495,10 +469,8 @@ def create_unit():
             }
         }), 201
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/admin/units/<int:unit_id>', methods=['PUT'])
 @require_api_key
@@ -536,10 +508,8 @@ def update_unit(unit_id):
             'message': 'Unit updated successfully'
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/admin/units/<int:unit_id>', methods=['DELETE'])
 @require_api_key
@@ -576,10 +546,8 @@ def delete_unit(unit_id):
             'message': 'Unit deleted successfully'
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/admin/activities', methods=['POST'])
 @require_api_key
@@ -617,10 +585,8 @@ def create_activity():
             }
         }), 201
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/admin/activities/<int:activity_id>', methods=['PUT'])
 @require_api_key
@@ -659,10 +625,8 @@ def update_activity(activity_id):
             'message': 'Activity updated successfully'
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 @api_bp.route('/admin/activities/<int:activity_id>', methods=['DELETE'])
 @require_api_key
@@ -699,7 +663,5 @@ def delete_activity(activity_id):
             'message': 'Activity deleted successfully'
         })
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        logger.error("Unhandled exception: %s", e, exc_info=True)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
