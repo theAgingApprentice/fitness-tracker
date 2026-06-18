@@ -67,6 +67,40 @@ See [.env.example](.env.example) for all required variables.
 
 ---
 
+## Development Notes
+
+### MitchellNET Header/Footer
+
+The app uses the shared MitchellNET header and footer fragments served by `nginx-proxy` from
+`~/web_server/includes/` on the server. Both `index.html` and `admin.html` load them via the
+client-side include system:
+
+```html
+<div data-include="/includes/header.html"></div>
+<div data-include="/includes/footer.html"></div>
+```
+
+To update the nav or footer, edit `InternalWebServer/includes/header.html` or
+`InternalWebServer/includes/footer.html` and merge via PR. All apps pick up the change
+automatically — no changes required here.
+
+### CSS
+
+The app loads two stylesheets:
+
+- `/css/style.css` — shared MitchellNET stylesheet (nav, footer, typography). Served by `nginx-proxy` from the `InternalWebServer` repo.
+- `css/style.css` — app-specific styles (calendar, activity cards, forms). Lives in `frontend/css/style.css` in this repo.
+
+Do not duplicate styles already in the shared stylesheet.
+
+### Docker Health Check
+
+The `app/Dockerfile` installs `curl` and defines a `HEALTHCHECK` targeting `/api/health`.
+This is required — without `curl` in the container, Docker marks the container `unhealthy`
+even when the app is working correctly.
+
+---
+
 ## Security
 
 ### API Authentication
